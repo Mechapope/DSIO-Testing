@@ -55,7 +55,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MeowDSIO-master\MeowDSIO-master\MeowDSIO\MeowDSIO.csproj">
+    <ProjectReference Include="..\MeowDSIO\MeowDSIO.csproj">
       <Project>{4ad69470-8146-4d20-94f0-da9844eee5a2}</Project>
       <Name>MeowDSIO</Name>
     </ProjectReference>

@@ -1,0 +1,48 @@
+AI_STANDARD_INFO_BANK
+-looks like these are entirely unused
+-just try maxing radar range, x + y, territory size.
+
+ATK_PARAM_ST (NPC)
+-mess around with knockbackDist
+-test IgnoreNotifyMissSwingForAI
+-dmgLevel - 7 or 9 for all
+-guardAtkRate - all 999
+
+BEHAVIOR_PARAM_ST (NPC)
+-try copying variationId + behaviorJudgeID + refId to another NPC
+-otherwise change behaviourJudgeId + refId within the same variationId
+
+ENEMY_STANDARD_INFO_BANK
+-also looks to be unused
+
+NPC_PARAM_ST
+-Change behevaiourVariationId + aiThinkId. Combination may need to stay together
+
+NPC_THINK_PARAM_ST
+-Try messing with battleGoalID
+-To make super aggro, increase farDist, outDist, eye_dist, ear_dist, nose_dist, maxBackHome_dist, forget times, battle start dist, eye angles, ear angles TO THE MAXXX
+-test disablePathMove, all enableNaviFlgs
+
+OBJECT_PARAM_ST
+-make everything a ladder
+-make everything breakOnPlayerCollide
+-make everything isMoveObj
+
+RAGDOLL_PARAM_ST
+-just make everything go nuts
+-enable, max everything
+
+SKELETON_PARAM_ST
+-Just mess with it
+-knee axis type?
+
+TALK_PARAM_ST
+-Voice line rando
+
+THROW_INFO_BANK
+- ID 12792 is BKS - for testing
+-Change dist, diffAngMax, YRange
+
+
+AllDrawParam rando
+-All DOF_Banks, all ENV_LIGHT_TEX_BANK, etc
