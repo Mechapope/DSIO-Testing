@@ -44,6 +44,9 @@ THROW_INFO_BANK
 - ID 12792 is BKS - for testing
 -Change dist, diffAngMax, YRange
 
+SP_EFFECT_PARAM_ST
+-gravityRate
+
 
 AllDrawParam rando
 -All DOF_Banks, all ENV_LIGHT_TEX_BANK, etc
