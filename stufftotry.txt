@@ -7,6 +7,7 @@ ATK_PARAM_ST (NPC)
 -test IgnoreNotifyMissSwingForAI
 -dmgLevel - 7 or 9 for all
 -guardAtkRate - all 999
+-increase hit radius, dmyPolys?
 
 BEHAVIOR_PARAM_ST (NPC)
 -try copying variationId + behaviorJudgeID + refId to another NPC
@@ -46,3 +47,29 @@ THROW_INFO_BANK
 
 AllDrawParam rando
 -All DOF_Banks, all ENV_LIGHT_TEX_BANK, etc
+
+
+
+*STILL TO TEST*
+
+AI_STANDARD_INFO_BANK
+-if this does anything
+
+AtkParam_NPC
+-IgnoreNotifyMissSwingForAI
+-hitStopTime
+
+BEHAVIOR_PARAM_ST
+-If I can move variationId to a new NPC, or only mix behav/ref in the same variationId
+
+NPC_PARAM_ST
+-see above
+-turn velocity
+-speffect rando
+
+NPC_THINK_PARAM_ST
+-call help things
+-enableNaviFlag_InSideWall
+
+THROW_INFO_BANK
+-manually test?
