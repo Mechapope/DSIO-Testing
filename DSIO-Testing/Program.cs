@@ -19,8 +19,8 @@ namespace DSIO_Testing
         {
             List<PARAMDEF> ParamDefs = new List<PARAMDEF>();
             List<PARAM> AllParams = new List<PARAM>();
-            //var gameFolder = @"D:\Program Files (x86)\Steam\steamapps\common\Dark Souls Prepare to Die Edition\DATA\";
-            var gameFolder = @"C:\Users\mcouture\Desktop\DS-Modding\Dark Souls Prepare to Die Edition\DATA\";
+            var gameFolder = @"D:\Program Files (x86)\Steam\steamapps\common\Dark Souls Prepare to Die Edition\DATA\";
+            //var gameFolder = @"C:\Users\mcouture\Desktop\DS-Modding\Dark Souls Prepare to Die Edition\DATA\";
 
             var gameparamBnds = Directory.GetFiles(gameFolder + "param\\GameParam\\", "*.parambnd")
                 .Select(p => DataFile.LoadFromFile<BND>(p, new Progress<(int, int)>((pr) =>
@@ -83,7 +83,7 @@ namespace DSIO_Testing
                             {
                                 Type type = cell.GetType();
                                 PropertyInfo prop = type.GetProperty("Value");
-                                prop.SetValue(cell, cell.Def.Max, null);
+                                //prop.SetValue(cell, cell.Def.Max, null);
                             }
                         }
                     }
@@ -109,7 +109,7 @@ namespace DSIO_Testing
                         Random r = new Random();
                         foreach (MeowDSIO.DataTypes.PARAM.ParamCellValueRef cell in paramRow.Cells)
                         {
-                            if (cell.Def.Name == "guardAtkRate" || cell.Def.Name == "IgnoreNotifyMissSwingForAI" || cell.Def.Name == "knockbackDist" || cell.Def.Name == "hitStopTime")
+                            if (cell.Def.Name == "guardAtkRate" || cell.Def.Name == "knockbackDist")
                             {
                                 Type type = cell.GetType();
                                 PropertyInfo prop = type.GetProperty("Value");
@@ -121,11 +121,10 @@ namespace DSIO_Testing
                                 PropertyInfo prop = type.GetProperty("Value");
                                 prop.SetValue(cell, 7, null);
                             }
-                            //double hitbox radius?
                             else if (cell.Def.Name == "hit0_Radius")
                             {
                                 PropertyInfo prop = cell.GetType().GetProperty("Value");
-                                prop.SetValue(cell, (float)(prop.GetValue(cell, null)) * 2, null);
+                                prop.SetValue(cell, (float)(prop.GetValue(cell, null)) * 1.5, null);
                             }
 
                             //rando spEffectId0
@@ -139,16 +138,6 @@ namespace DSIO_Testing
 
                                 allSpEffects.RemoveAt(randomIndex);
                             }
-                        }
-                    }
-                }
-                else if (paramFile.VirtualUri.EndsWith("BehaviorParam.param"))
-                {
-                    foreach (MeowDSIO.DataTypes.PARAM.ParamRow paramRow in paramFile.Entries)
-                    {
-                        foreach (MeowDSIO.DataTypes.PARAM.ParamCellValueRef cell in paramRow.Cells)
-                        {
-
                         }
                     }
                 }
@@ -205,12 +194,56 @@ namespace DSIO_Testing
                         foreach (MeowDSIO.DataTypes.PARAM.ParamCellValueRef cell in paramRow.Cells)
                         {
                             //more concise way of listing many cells
-                            string[] attrsToMax = { "farDist", "outDist", "eye_dist", "ear_dist", "nose_dist", "maxBackhomeDist", "backhomeDist", "backhomeBattleDist", "BackHome_LookTargetTime", "BackHome_LookTargetDist", "BattleStartDist", "eye_angX", "eye_angY", "ear_angX", "ear_angY", "enableNaviFlg_InSideWall" };
+                            string[] attrsToMax = { "farDist", "outDist", "eye_dist", "ear_dist", "nose_dist", "maxBackhomeDist", "backhomeDist", "backhomeBattleDist", "BackHome_LookTargetTime", "BackHome_LookTargetDist", "BattleStartDist", "eye_angX", "eye_angY", "ear_angX", "ear_angY", "SightTargetForgetTime", "SoundTargetForgetTime" };
                             if (attrsToMax.Contains(cell.Def.Name))
                             {
                                 Type type = cell.GetType();
                                 PropertyInfo prop = type.GetProperty("Value");
                                 prop.SetValue(cell, cell.Def.Max, null);
+                            }
+
+                            string[] attrsToMin = { "nearDist", "midDist" };
+                            if (attrsToMin.Contains(cell.Def.Name))
+                            {
+                                Type type = cell.GetType();
+                                PropertyInfo prop = type.GetProperty("Value");
+                                prop.SetValue(cell, cell.Def.Min, null);
+                            }
+                            else if (cell.Def.Name == "CallHelp_ReplyBehaviorType")
+                            {
+                                Type type = cell.GetType();
+                                PropertyInfo prop = type.GetProperty("Value");
+                                prop.SetValue(cell, 1, null);
+                            }
+                            else if (cell.Def.Name == "CallHelp_ActionAnimId")
+                            {
+                                Type type = cell.GetType();
+                                PropertyInfo prop = type.GetProperty("Value");
+                                prop.SetValue(cell, -1, null);
+                            }
+                            else if (cell.Def.Name == "CallHelp_ForgetTimeByArrival")
+                            {
+                                Type type = cell.GetType();
+                                PropertyInfo prop = type.GetProperty("Value");
+                                prop.SetValue(cell, 20, null);
+                            }
+                            else if (cell.Def.Name == "CallHelp_CallValidRange")
+                            {
+                                Type type = cell.GetType();
+                                PropertyInfo prop = type.GetProperty("Value");
+                                prop.SetValue(cell, 50, null);
+                            }
+                            else if (cell.Def.Name == "CallHelp_MinWaitTime")
+                            {
+                                Type type = cell.GetType();
+                                PropertyInfo prop = type.GetProperty("Value");
+                                prop.SetValue(cell, 0, null);
+                            }
+                            else if (cell.Def.Name == "CallHelp_MaxWaitTime")
+                            {
+                                Type type = cell.GetType();
+                                PropertyInfo prop = type.GetProperty("Value");
+                                prop.SetValue(cell, 10, null);
                             }
                         }
                     }
@@ -335,27 +368,34 @@ namespace DSIO_Testing
                     List<int> allspAtkcategories = new List<int>();
                     foreach (MeowDSIO.DataTypes.PARAM.ParamRow paramRow in paramFile.Entries)
                     {
-                        foreach (MeowDSIO.DataTypes.PARAM.ParamCellValueRef cell in paramRow.Cells)
+                        //check not to randomize moveset of bows which defeats the purpose of bullet rando
+                        MeowDSIO.DataTypes.PARAM.ParamCellValueRef bowCheckCell = paramRow.Cells.First(c => c.Def.Name == "bowDistRate");
+                        Type bowchecktype = bowCheckCell.GetType();
+                        PropertyInfo bowcheckprop = bowchecktype.GetProperty("Value");
+                        if (Convert.ToInt32(bowcheckprop.GetValue(bowCheckCell, null)) < 0)
                         {
-                            if (cell.Def.Name == "wepmotionCategory")
+                            foreach (MeowDSIO.DataTypes.PARAM.ParamCellValueRef cell in paramRow.Cells)
                             {
-                                PropertyInfo pi = cell.GetType().GetProperty("Value");
-                                allWepmotionCats.Add(Convert.ToInt32(pi.GetValue(cell, null)));
-                            }
-                            else if (cell.Def.Name == "wepmotionOneHandId")
-                            {
-                                PropertyInfo pi = cell.GetType().GetProperty("Value");
-                                allWepmotion1hCats.Add(Convert.ToInt32(pi.GetValue(cell, null)));
-                            }
-                            else if (cell.Def.Name == "wepmotionBothHandId")
-                            {
-                                PropertyInfo pi = cell.GetType().GetProperty("Value");
-                                allWepmotion2hCats.Add(Convert.ToInt32(pi.GetValue(cell, null)));
-                            }
-                            else if (cell.Def.Name == "spAtkcategory")
-                            {
-                                PropertyInfo pi = cell.GetType().GetProperty("Value");
-                                allspAtkcategories.Add(Convert.ToInt32(pi.GetValue(cell, null)));
+                                if (cell.Def.Name == "wepmotionCategory")
+                                {
+                                    PropertyInfo pi = cell.GetType().GetProperty("Value");
+                                    allWepmotionCats.Add(Convert.ToInt32(pi.GetValue(cell, null)));
+                                }
+                                else if (cell.Def.Name == "wepmotionOneHandId")
+                                {
+                                    PropertyInfo pi = cell.GetType().GetProperty("Value");
+                                    allWepmotion1hCats.Add(Convert.ToInt32(pi.GetValue(cell, null)));
+                                }
+                                else if (cell.Def.Name == "wepmotionBothHandId")
+                                {
+                                    PropertyInfo pi = cell.GetType().GetProperty("Value");
+                                    allWepmotion2hCats.Add(Convert.ToInt32(pi.GetValue(cell, null)));
+                                }
+                                else if (cell.Def.Name == "spAtkcategory")
+                                {
+                                    PropertyInfo pi = cell.GetType().GetProperty("Value");
+                                    allspAtkcategories.Add(Convert.ToInt32(pi.GetValue(cell, null)));
+                                }
                             }
                         }
                     }
@@ -365,47 +405,54 @@ namespace DSIO_Testing
                     {
                         Random r = new Random();
 
-                        foreach (MeowDSIO.DataTypes.PARAM.ParamCellValueRef cell in paramRow.Cells)
+                        MeowDSIO.DataTypes.PARAM.ParamCellValueRef bowCheckCell = paramRow.Cells.First(c => c.Def.Name == "bowDistRate");
+                        Type bowchecktype = bowCheckCell.GetType();
+                        PropertyInfo bowcheckprop = bowchecktype.GetProperty("Value");
+
+                        if (Convert.ToInt32(bowcheckprop.GetValue(bowCheckCell, null)) < 0)
                         {
-                            if (cell.Def.Name == "wepmotionCategory")
+                            foreach (MeowDSIO.DataTypes.PARAM.ParamCellValueRef cell in paramRow.Cells)
                             {
-                                int randomIndex = r.Next(allWepmotionCats.Count);
-                                Type type = cell.GetType();
-                                PropertyInfo prop = type.GetProperty("Value");
+                                if (cell.Def.Name == "wepmotionCategory")
+                                {
+                                    int randomIndex = r.Next(allWepmotionCats.Count);
+                                    Type type = cell.GetType();
+                                    PropertyInfo prop = type.GetProperty("Value");
 
-                                prop.SetValue(cell, allWepmotionCats[randomIndex], null);
+                                    prop.SetValue(cell, allWepmotionCats[randomIndex], null);
 
-                                allWepmotionCats.RemoveAt(randomIndex);
-                            }
-                            else if (cell.Def.Name == "wepmotionOneHandId")
-                            {
-                                int randomIndex = r.Next(allWepmotion1hCats.Count);
-                                Type type = cell.GetType();
-                                PropertyInfo prop = type.GetProperty("Value");
+                                    allWepmotionCats.RemoveAt(randomIndex);
+                                }
+                                else if (cell.Def.Name == "wepmotionOneHandId")
+                                {
+                                    int randomIndex = r.Next(allWepmotion1hCats.Count);
+                                    Type type = cell.GetType();
+                                    PropertyInfo prop = type.GetProperty("Value");
 
-                                prop.SetValue(cell, allWepmotion1hCats[randomIndex], null);
+                                    prop.SetValue(cell, allWepmotion1hCats[randomIndex], null);
 
-                                allWepmotion1hCats.RemoveAt(randomIndex);
-                            }
-                            else if (cell.Def.Name == "wepmotionBothHandId")
-                            {
-                                int randomIndex = r.Next(allWepmotion2hCats.Count);
-                                Type type = cell.GetType();
-                                PropertyInfo prop = type.GetProperty("Value");
+                                    allWepmotion1hCats.RemoveAt(randomIndex);
+                                }
+                                else if (cell.Def.Name == "wepmotionBothHandId")
+                                {
+                                    int randomIndex = r.Next(allWepmotion2hCats.Count);
+                                    Type type = cell.GetType();
+                                    PropertyInfo prop = type.GetProperty("Value");
 
-                                prop.SetValue(cell, allWepmotion2hCats[randomIndex], null);
+                                    prop.SetValue(cell, allWepmotion2hCats[randomIndex], null);
 
-                                allWepmotion2hCats.RemoveAt(randomIndex);
-                            }
-                            else if (cell.Def.Name == "spAtkcategory")
-                            {
-                                int randomIndex = r.Next(allspAtkcategories.Count);
-                                Type type = cell.GetType();
-                                PropertyInfo prop = type.GetProperty("Value");
+                                    allWepmotion2hCats.RemoveAt(randomIndex);
+                                }
+                                else if (cell.Def.Name == "spAtkcategory")
+                                {
+                                    int randomIndex = r.Next(allspAtkcategories.Count);
+                                    Type type = cell.GetType();
+                                    PropertyInfo prop = type.GetProperty("Value");
 
-                                prop.SetValue(cell, allspAtkcategories[randomIndex], null);
+                                    prop.SetValue(cell, allspAtkcategories[randomIndex], null);
 
-                                allspAtkcategories.RemoveAt(randomIndex);
+                                    allspAtkcategories.RemoveAt(randomIndex);
+                                }
                             }
                         }
                     }
