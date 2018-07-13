@@ -19,7 +19,8 @@ namespace DSIO_Testing
         {
             List<PARAMDEF> ParamDefs = new List<PARAMDEF>();
             List<PARAM> AllParams = new List<PARAM>();
-            var gameFolder = @"D:\Program Files (x86)\Steam\steamapps\common\Dark Souls Prepare to Die Edition\DATA\";
+            //var gameFolder = @"D:\Program Files (x86)\Steam\steamapps\common\Dark Souls Prepare to Die Edition\DATA\";
+            var gameFolder = @"C:\Users\mcouture\Desktop\DS-Modding\Dark Souls Prepare to Die Edition\DATA\";
 
             var gameparamBnds = Directory.GetFiles(gameFolder + "param\\GameParam\\", "*.parambnd")
                 .Select(p => DataFile.LoadFromFile<BND>(p, new Progress<(int, int)>((pr) =>
@@ -321,6 +322,90 @@ namespace DSIO_Testing
                                 prop.SetValue(cell, allMsgs[randomIndex], null);
 
                                 allMsgs.RemoveAt(randomIndex);
+                            }
+                        }
+                    }
+                }
+                else if (paramFile.ID == "EQUIP_PARAM_WEAPON_ST")
+                {
+                    //loop through all entries once to get list of values
+                    List<int> allWepmotionCats = new List<int>();
+                    List<int> allWepmotion1hCats = new List<int>();
+                    List<int> allWepmotion2hCats = new List<int>();
+                    List<int> allspAtkcategories = new List<int>();
+                    foreach (MeowDSIO.DataTypes.PARAM.ParamRow paramRow in paramFile.Entries)
+                    {
+                        foreach (MeowDSIO.DataTypes.PARAM.ParamCellValueRef cell in paramRow.Cells)
+                        {
+                            if (cell.Def.Name == "wepmotionCategory")
+                            {
+                                PropertyInfo pi = cell.GetType().GetProperty("Value");
+                                allWepmotionCats.Add(Convert.ToInt32(pi.GetValue(cell, null)));
+                            }
+                            else if (cell.Def.Name == "wepmotionOneHandId")
+                            {
+                                PropertyInfo pi = cell.GetType().GetProperty("Value");
+                                allWepmotion1hCats.Add(Convert.ToInt32(pi.GetValue(cell, null)));
+                            }
+                            else if (cell.Def.Name == "wepmotionBothHandId")
+                            {
+                                PropertyInfo pi = cell.GetType().GetProperty("Value");
+                                allWepmotion2hCats.Add(Convert.ToInt32(pi.GetValue(cell, null)));
+                            }
+                            else if (cell.Def.Name == "spAtkcategory")
+                            {
+                                PropertyInfo pi = cell.GetType().GetProperty("Value");
+                                allspAtkcategories.Add(Convert.ToInt32(pi.GetValue(cell, null)));
+                            }
+                        }
+                    }
+
+                    //loop again to set a random value per entry
+                    foreach (MeowDSIO.DataTypes.PARAM.ParamRow paramRow in paramFile.Entries)
+                    {
+                        Random r = new Random();
+
+                        foreach (MeowDSIO.DataTypes.PARAM.ParamCellValueRef cell in paramRow.Cells)
+                        {
+                            if (cell.Def.Name == "wepmotionCategory")
+                            {
+                                int randomIndex = r.Next(allWepmotionCats.Count);
+                                Type type = cell.GetType();
+                                PropertyInfo prop = type.GetProperty("Value");
+
+                                prop.SetValue(cell, allWepmotionCats[randomIndex], null);
+
+                                allWepmotionCats.RemoveAt(randomIndex);
+                            }
+                            else if (cell.Def.Name == "wepmotionOneHandId")
+                            {
+                                int randomIndex = r.Next(allWepmotion1hCats.Count);
+                                Type type = cell.GetType();
+                                PropertyInfo prop = type.GetProperty("Value");
+
+                                prop.SetValue(cell, allWepmotion1hCats[randomIndex], null);
+
+                                allWepmotion1hCats.RemoveAt(randomIndex);
+                            }
+                            else if (cell.Def.Name == "wepmotionBothHandId")
+                            {
+                                int randomIndex = r.Next(allWepmotion2hCats.Count);
+                                Type type = cell.GetType();
+                                PropertyInfo prop = type.GetProperty("Value");
+
+                                prop.SetValue(cell, allWepmotion2hCats[randomIndex], null);
+
+                                allWepmotion2hCats.RemoveAt(randomIndex);
+                            }
+                            else if (cell.Def.Name == "spAtkcategory")
+                            {
+                                int randomIndex = r.Next(allspAtkcategories.Count);
+                                Type type = cell.GetType();
+                                PropertyInfo prop = type.GetProperty("Value");
+
+                                prop.SetValue(cell, allspAtkcategories[randomIndex], null);
+
+                                allspAtkcategories.RemoveAt(randomIndex);
                             }
                         }
                     }
