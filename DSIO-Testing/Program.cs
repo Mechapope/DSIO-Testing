@@ -9,47 +9,59 @@ using MeowDSIO.DataTypes;
 using System.IO;
 using System.Collections.ObjectModel;
 using System.Reflection;
+using System.Net.Http;
+using System.Net;
+using System.Web;
+using System.Web.Script.Serialization;
+using Newtonsoft.Json;
 
 namespace DSIO_Testing
 {
-
     class Program
     {
+        private static readonly HttpClient client = new HttpClient();
+
         static void Main(string[] args)
         {
             List<PARAMDEF> ParamDefs = new List<PARAMDEF>();
             List<PARAM> AllParams = new List<PARAM>();
-            var gameFolder = @"D:\Program Files (x86)\Steam\steamapps\common\Dark Souls Prepare to Die Edition\DATA\";
-            //var gameFolder = @"C:\Users\mcouture\Desktop\DS-Modding\Dark Souls Prepare to Die Edition\DATA\";
+            //var gameFolder = @"D:\Program Files (x86)\Steam\steamapps\common\Dark Souls Prepare to Die Edition\DATA\";
+            var gameFolder = @"C:\Users\mcouture\Desktop\DS-Modding\Dark Souls Prepare to Die Edition\DATA\";
 
             var gameparamBnds = Directory.GetFiles(gameFolder + "param\\GameParam\\", "*.parambnd")
-                .Select(p => DataFile.LoadFromFile<BND>(p, new Progress<(int, int)>((pr) =>
-                {
+                .Select(p => DataFile.LoadFromFile<BND>(p, new Progress<(int, int) > ((pr) =>
+                  {
 
-                })));
+                  })));
 
-            var drawparamBnds = Directory.GetFiles(gameFolder + "param\\DrawParam\\", "*.parambnd")
-                .Select(p => DataFile.LoadFromFile<BND>(p, new Progress<(int, int)>((pr) =>
-                {
+            //var drawparamBnds = Directory.GetFiles(gameFolder + "param\\DrawParam\\", "*.parambnd")
+            //    .Select(p => DataFile.LoadFromFile<BND>(p, new Progress<(int, int)>((pr) =>
+            //    {
 
-                })));
+            //    })));
 
-            List<BND> PARAMBNDs = gameparamBnds.Concat(drawparamBnds).ToList();
+            List<BND> PARAMBNDs = gameparamBnds.ToList();
 
-            var paramdefBnds = Directory.GetFiles(gameFolder + "paramdef\\", "*.paramdefbnd")
-                .Select(p => DataFile.LoadFromFile<BND>(p, new Progress<(int, int)>((pr) =>
+            List<BND> allMsgBnds = Directory.GetFiles(gameFolder + "msg\\ENGLISH\\", "*.msgbnd")
+                .Select(p => DataFile.LoadFromFile<BND>(p, new Progress<(int, int) > ((pr) =>
                 {
 
                 }))).ToList();
+
+            var paramdefBnds = Directory.GetFiles(gameFolder + "paramdef\\", "*.paramdefbnd")
+                .Select(p => DataFile.LoadFromFile<BND>(p, new Progress<(int, int) > ((pr) =>
+                  {
+
+                  }))).ToList();
 
             for (int i = 0; i < paramdefBnds.Count(); i++)
             {
                 foreach (var paramdef in paramdefBnds[i])
                 {
-                    PARAMDEF newParamDef = paramdef.ReadDataAs<PARAMDEF>(new Progress<(int, int)>((r) =>
-                    {
+                    PARAMDEF newParamDef = paramdef.ReadDataAs<PARAMDEF>(new Progress<(int, int) > ((r) =>
+                      {
 
-                    }));
+                      }));
                     ParamDefs.Add(newParamDef);
                 }
             }
@@ -58,10 +70,10 @@ namespace DSIO_Testing
             {
                 foreach (var param in PARAMBNDs[i])
                 {
-                    PARAM newParam = param.ReadDataAs<PARAM>(new Progress<(int, int)>((p) =>
-                    {
+                    PARAM newParam = param.ReadDataAs<PARAM>(new Progress<(int, int) > ((p) =>
+                      {
 
-                    }));
+                      }));
 
                     newParam.ApplyPARAMDEFTemplate(ParamDefs.Where(x => x.ID == newParam.ID).First());
 
@@ -69,6 +81,39 @@ namespace DSIO_Testing
                 }
             }
             //Loading params complete
+            List<FMG> allFmgs = new List<FMG>();
+
+            for (int i = 0; i < allMsgBnds.Count(); i++)
+            {
+                foreach (var msgbnd in allMsgBnds[i])
+                {
+                    FMG newBnd = msgbnd.ReadDataAs<FMG>(new Progress<(int, int) > ((p) =>
+                    {
+
+                    }));
+
+                    allFmgs.Add(newBnd);
+                }
+            }
+            int fmgCounter = 1;
+
+            foreach (FMG currentFmg in allFmgs)
+            {
+                //this one is Japanese for some reason
+                if (currentFmg.VirtualUri != "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\項目ヘルプ.fmg")
+                {
+                    foreach (var entry in currentFmg.Entries)
+                    {
+                        PropertyInfo prop = entry.GetType().GetProperty("Value");
+                        string newEntryText = TranslateText(prop.GetValue(entry, null).ToString());
+                        prop.SetValue(entry, newEntryText, null);
+                    }
+                }
+                fmgCounter++;
+                Console.WriteLine("Finished translating FMG " + fmgCounter + " of " + allFmgs.Count);
+            }
+
+            //string test = TranslateText("Online play item.\nLure phantoms from other worlds.\n\nThe dreadful Eyes of Death spread disaster\nacross neighboring worlds. Phantoms lured\nto the host world may end up as victims,\nallowing the Eyes of Death to multiply,\nand leading to further proliferation of bane.");
 
             //change all the things
             foreach (PARAM paramFile in AllParams)
@@ -1335,18 +1380,92 @@ namespace DSIO_Testing
                     var matchingParam = AllParams.Where(x => x.VirtualUri == param.Name).First();
 
                     param.ReplaceData(matchingParam,
-                        new Progress<(int, int)>((p) =>
+                        new Progress<(int, int) > ((p) =>
+                          {
+
+                          }));
+                }
+
+                DataFile.Resave(paramBnd, new Progress<(int, int) > ((p) =>
+                  {
+
+                  }));
+            }
+
+            //msgs
+            foreach (var msgBnd in allMsgBnds)
+            {
+                foreach (var bnd in msgBnd)
+                {
+                    var filteredParamName = bnd.Name.Substring(bnd.Name.LastIndexOf("\\") + 1).Replace(".msg", "");
+
+                    var matchingParam = allFmgs.Where(x => x.VirtualUri == bnd.Name).First();
+
+                    bnd.ReplaceData(matchingParam,
+                        new Progress<(int, int) > ((p) =>
                         {
 
                         }));
                 }
 
-                DataFile.Resave(paramBnd, new Progress<(int, int)>((p) =>
+                DataFile.Resave(msgBnd, new Progress<(int, int) > ((p) =>
                 {
 
                 }));
             }
-
         }
+
+        public static string TranslateText(string text)
+        {
+            int numOfTranslations = 15;
+            string[] supportedLanguages = { "af", "sq", "az", "eu", "ca", "hr", "cs", "da", "nl", "en", "eo", "et", "tl", "fi", "fr", "gl", "de", "ht", "hu", "is", "id", "ga", "it", "la", "lv", "lt", "ms", "mt", "no", "pl", "pt", "ro", "sk", "sl", "es", "sw", "sv", "tr", "vi", "cy" };
+
+            //nulls or placeholders, leave as is
+            if (text.Contains("<"))
+            {
+                return text;
+            }            
+
+            Random r = new Random();
+            //first language always has to be english
+            string previousLanguage = "en";
+
+            for (int i = 0; i < numOfTranslations; i++)
+            {
+                //pick a random language to translate to
+                string nextLanguage = supportedLanguages[r.Next(supportedLanguages.Count())];
+                text = SendToTranslator(text, previousLanguage, nextLanguage).Result;
+                previousLanguage = nextLanguage;
+            }
+
+            //finally, translate back to english
+            text = SendToTranslator(text, previousLanguage, "en").Result;
+
+            return text;
+        }
+
+        public static async Task<string> SendToTranslator(string text, string inLanguage, string outLanguage)
+        {
+            string translateUrl = "https://translate.googleapis.com/translate_a/single?ie=UTF-8&oe=UTF-8&multires=1&client=gtx&sl=" + inLanguage + "&tl=" + outLanguage + "&dt=t&q=" + HttpUtility.UrlEncode(text);
+
+            var response = await client.PostAsync(translateUrl, null);
+            string contents = await response.Content.ReadAsStringAsync();
+
+            //the json google returns is confusing af and has no names
+            var objson = JsonConvert.DeserializeObject<List<object>>(contents)[0];
+            var jsonStrings = JsonConvert.DeserializeObject<List<List<string>>>(objson.ToString());
+
+            StringBuilder sb = new StringBuilder();
+
+            foreach (var item in jsonStrings)
+            {
+                //first index is the translated value, dont care about the others
+                sb.Append(item[0]);
+            }
+
+            return sb.ToString();
+        }
+
     }
+
 }
