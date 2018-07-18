@@ -12,7 +12,6 @@ using System.Reflection;
 using System.Net.Http;
 using System.Net;
 using System.Web;
-using System.Web.Script.Serialization;
 using Newtonsoft.Json;
 
 namespace DSIO_Testing
@@ -25,14 +24,14 @@ namespace DSIO_Testing
         {
             List<PARAMDEF> ParamDefs = new List<PARAMDEF>();
             List<PARAM> AllParams = new List<PARAM>();
-            //var gameFolder = @"D:\Program Files (x86)\Steam\steamapps\common\Dark Souls Prepare to Die Edition\DATA\";
-            var gameFolder = @"C:\Users\mcouture\Desktop\DS-Modding\Dark Souls Prepare to Die Edition\DATA\";
+            var gameFolder = @"D:\Program Files (x86)\Steam\steamapps\common\Dark Souls Prepare to Die Edition\DATA\";
+            //var gameFolder = @"C:\Users\mcouture\Desktop\DS-Modding\Dark Souls Prepare to Die Edition\DATA\";
 
             var gameparamBnds = Directory.GetFiles(gameFolder + "param\\GameParam\\", "*.parambnd")
-                .Select(p => DataFile.LoadFromFile<BND>(p, new Progress<(int, int) > ((pr) =>
-                  {
+                .Select(p => DataFile.LoadFromFile<BND>(p, new Progress<(int, int)>((pr) =>
+                {
 
-                  })));
+                })));
 
             //var drawparamBnds = Directory.GetFiles(gameFolder + "param\\DrawParam\\", "*.parambnd")
             //    .Select(p => DataFile.LoadFromFile<BND>(p, new Progress<(int, int)>((pr) =>
@@ -43,25 +42,25 @@ namespace DSIO_Testing
             List<BND> PARAMBNDs = gameparamBnds.ToList();
 
             List<BND> allMsgBnds = Directory.GetFiles(gameFolder + "msg\\ENGLISH\\", "*.msgbnd")
-                .Select(p => DataFile.LoadFromFile<BND>(p, new Progress<(int, int) > ((pr) =>
+                .Select(p => DataFile.LoadFromFile<BND>(p, new Progress<(int, int)>((pr) =>
                 {
 
                 }))).ToList();
 
             var paramdefBnds = Directory.GetFiles(gameFolder + "paramdef\\", "*.paramdefbnd")
-                .Select(p => DataFile.LoadFromFile<BND>(p, new Progress<(int, int) > ((pr) =>
-                  {
+                .Select(p => DataFile.LoadFromFile<BND>(p, new Progress<(int, int)>((pr) =>
+                {
 
-                  }))).ToList();
+                }))).ToList();
 
             for (int i = 0; i < paramdefBnds.Count(); i++)
             {
                 foreach (var paramdef in paramdefBnds[i])
                 {
-                    PARAMDEF newParamDef = paramdef.ReadDataAs<PARAMDEF>(new Progress<(int, int) > ((r) =>
-                      {
+                    PARAMDEF newParamDef = paramdef.ReadDataAs<PARAMDEF>(new Progress<(int, int)>((r) =>
+                    {
 
-                      }));
+                    }));
                     ParamDefs.Add(newParamDef);
                 }
             }
@@ -70,10 +69,10 @@ namespace DSIO_Testing
             {
                 foreach (var param in PARAMBNDs[i])
                 {
-                    PARAM newParam = param.ReadDataAs<PARAM>(new Progress<(int, int) > ((p) =>
-                      {
+                    PARAM newParam = param.ReadDataAs<PARAM>(new Progress<(int, int)>((p) =>
+                    {
 
-                      }));
+                    }));
 
                     newParam.ApplyPARAMDEFTemplate(ParamDefs.Where(x => x.ID == newParam.ID).First());
 
@@ -87,7 +86,7 @@ namespace DSIO_Testing
             {
                 foreach (var msgbnd in allMsgBnds[i])
                 {
-                    FMG newBnd = msgbnd.ReadDataAs<FMG>(new Progress<(int, int) > ((p) =>
+                    FMG newBnd = msgbnd.ReadDataAs<FMG>(new Progress<(int, int)>((p) =>
                     {
 
                     }));
@@ -95,21 +94,36 @@ namespace DSIO_Testing
                     allFmgs.Add(newBnd);
                 }
             }
-            int fmgCounter = 1;
+            int fmgCounter = 0;
+
+
+
+            string[] fmglist = {"N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\アイテム名.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\武器名.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\防具名.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\アクセサリ名.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\魔法名.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\特徴名.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\特徴説明.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\特徴うんちく.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\NPC名.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\地名.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\アイテム説明.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\武器説明.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\防具説明.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\アクセサリ説明.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\アイテムうんちく.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\武器うんちく.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\防具うんちく.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\アクセサリうんちく.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\魔法説明.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\魔法うんちく.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\会話.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\血文字.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\ムービー字幕.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\イベントテキスト.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\インゲームメニュー.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\メニュー共通テキスト.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\メニューその他.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\ダイアログ.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\キーガイド.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\一行ヘルプ.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\テキスト表示用タグ一覧.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\機種別タグ_win32.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\システムメッセージ_win32.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\アイテムうんちくパッチ.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\イベントテキストパッチ.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\ダイアログパッチ.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\システムメッセージ_win32パッチ.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\会話パッチ.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\魔法うんちくパッチ.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\武器うんちくパッチ.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\血文字パッチ.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\防具うんちくパッチ.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\アクセサリうんちくパッチ.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\アイテム説明パッチ.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\アイテム名パッチ.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\アクセサリ説明パッチ.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\アクセサリ名パッチ.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\武器説明パッチ.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\武器名パッチ.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\防具説明パッチ.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\防具名パッチ.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\魔法名パッチ.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\NPC名パッチ.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\地名パッチ.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\一行ヘルプパッチ.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\キーガイドパッチ.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\メニューその他パッチ.fmg", "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\メニュー共通テキストパッチ.fmg"};
 
             foreach (FMG currentFmg in allFmgs)
             {
                 //this one is Japanese for some reason
-                if (currentFmg.VirtualUri != "N:\\FRPG\\data\\Msg\\Data_ENGLISH\\win32\\項目ヘルプ.fmg")
+                if (currentFmg.VirtualUri == fmglist[fmgCounter])
                 {
                     foreach (var entry in currentFmg.Entries)
                     {
                         PropertyInfo prop = entry.GetType().GetProperty("Value");
-                        string newEntryText = TranslateText(prop.GetValue(entry, null).ToString());
-                        prop.SetValue(entry, newEntryText, null);
+
+                        string translatedText = TranslateText(prop.GetValue(entry, null).ToString());
+
+                        if (translatedText == "error")
+                        {
+                            Console.WriteLine("couldnt complete");
+                            break;
+                        }
+                        else
+                        {
+                            string newEntryText = TranslateText(prop.GetValue(entry, null).ToString()) + "*done*";
+                            prop.SetValue(entry, newEntryText, null);
+                        }                        
                     }
                 }
-                fmgCounter++;
+
                 Console.WriteLine("Finished translating FMG " + fmgCounter + " of " + allFmgs.Count);
             }
 
@@ -1380,16 +1394,16 @@ namespace DSIO_Testing
                     var matchingParam = AllParams.Where(x => x.VirtualUri == param.Name).First();
 
                     param.ReplaceData(matchingParam,
-                        new Progress<(int, int) > ((p) =>
-                          {
+                        new Progress<(int, int)>((p) =>
+                        {
 
-                          }));
+                        }));
                 }
 
-                DataFile.Resave(paramBnd, new Progress<(int, int) > ((p) =>
-                  {
+                DataFile.Resave(paramBnd, new Progress<(int, int)>((p) =>
+                {
 
-                  }));
+                }));
             }
 
             //msgs
@@ -1402,13 +1416,13 @@ namespace DSIO_Testing
                     var matchingParam = allFmgs.Where(x => x.VirtualUri == bnd.Name).First();
 
                     bnd.ReplaceData(matchingParam,
-                        new Progress<(int, int) > ((p) =>
+                        new Progress<(int, int)>((p) =>
                         {
 
                         }));
                 }
 
-                DataFile.Resave(msgBnd, new Progress<(int, int) > ((p) =>
+                DataFile.Resave(msgBnd, new Progress<(int, int)>((p) =>
                 {
 
                 }));
@@ -1417,14 +1431,15 @@ namespace DSIO_Testing
 
         public static string TranslateText(string text)
         {
-            int numOfTranslations = 15;
+            string originalText = text;
+            int numOfTranslations = 14;
             string[] supportedLanguages = { "af", "sq", "az", "eu", "ca", "hr", "cs", "da", "nl", "en", "eo", "et", "tl", "fi", "fr", "gl", "de", "ht", "hu", "is", "id", "ga", "it", "la", "lv", "lt", "ms", "mt", "no", "pl", "pt", "ro", "sk", "sl", "es", "sw", "sv", "tr", "vi", "cy" };
 
             //nulls or placeholders, leave as is
-            if (text.Contains("<"))
+            if (text.Contains("<") || text.Contains("*done*"))
             {
                 return text;
-            }            
+            }
 
             Random r = new Random();
             //first language always has to be english
@@ -1435,35 +1450,52 @@ namespace DSIO_Testing
                 //pick a random language to translate to
                 string nextLanguage = supportedLanguages[r.Next(supportedLanguages.Count())];
                 text = SendToTranslator(text, previousLanguage, nextLanguage).Result;
+
+                if (text == "error")
+                {
+                    return text;
+                }
+
                 previousLanguage = nextLanguage;
+                System.Threading.Thread.Sleep(6000);
             }
 
+            System.Threading.Thread.Sleep(30000);
             //finally, translate back to english
             text = SendToTranslator(text, previousLanguage, "en").Result;
 
             return text;
+            
         }
 
         public static async Task<string> SendToTranslator(string text, string inLanguage, string outLanguage)
         {
-            string translateUrl = "https://translate.googleapis.com/translate_a/single?ie=UTF-8&oe=UTF-8&multires=1&client=gtx&sl=" + inLanguage + "&tl=" + outLanguage + "&dt=t&q=" + HttpUtility.UrlEncode(text);
-
-            var response = await client.PostAsync(translateUrl, null);
-            string contents = await response.Content.ReadAsStringAsync();
-
-            //the json google returns is confusing af and has no names
-            var objson = JsonConvert.DeserializeObject<List<object>>(contents)[0];
-            var jsonStrings = JsonConvert.DeserializeObject<List<List<string>>>(objson.ToString());
-
-            StringBuilder sb = new StringBuilder();
-
-            foreach (var item in jsonStrings)
+            string contents = "";
+            try
             {
-                //first index is the translated value, dont care about the others
-                sb.Append(item[0]);
-            }
+                string translateUrl = "https://translate.googleapis.com/translate_a/single?ie=UTF-8&oe=UTF-8&multires=1&client=gtx&sl=" + inLanguage + "&tl=" + outLanguage + "&dt=t&q=" + WebUtility.UrlEncode(text);
 
-            return sb.ToString();
+                var response = await client.PostAsync(translateUrl, null);
+                contents = await response.Content.ReadAsStringAsync();
+
+                //the json google returns is confusing af and has no names
+                var objson = JsonConvert.DeserializeObject<List<object>>(contents)[0];
+                var jsonStrings = JsonConvert.DeserializeObject<List<List<string>>>(objson.ToString());
+
+                StringBuilder sb = new StringBuilder();
+
+                foreach (var item in jsonStrings)
+                {
+                    //first index is the translated value, dont care about the others
+                    sb.Append(item[0]);
+                }
+
+                return sb.ToString();
+            }
+            catch (Exception ex)
+            {
+                return "error";
+            }
         }
 
     }
